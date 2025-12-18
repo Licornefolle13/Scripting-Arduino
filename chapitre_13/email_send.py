@@ -1,15 +1,17 @@
 #chapitre 13
 
 import smtplib
+import getpass
 
 def prompt(title):
     return input(title).strip()
 
-from_addr = prompt("From: matteo.linglet@ynov.com")
-to_addrs  = prompt("To: matteo.liglet@gmail.com").split()
-print("Coucou c'est un test^D")
+from_addr = prompt("From (Outlook): ")
+password = getpass.getpass("Password (App password if 2FA enabled): ")
+to_addrs = prompt("To: ").split()
 
 lines = [f"From: {from_addr}", f"To: {', '.join(to_addrs)}", ""]
+print("Enter message body (Ctrl+D to finish):")
 while True:
     try:
         line = input()
@@ -21,7 +23,9 @@ while True:
 msg = "\r\n".join(lines)
 print("Message length is", len(msg))
 
-server = smtplib.SMTP("localhost")
-server.set_debuglevel(1)
+server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+server.starttls()
+server.login(from_addr, password)
 server.sendmail(from_addr, to_addrs, msg)
 server.quit()
+print("Email sent successfully!")
